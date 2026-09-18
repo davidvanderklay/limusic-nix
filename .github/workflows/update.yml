@@ -1,0 +1,46 @@
+name: Update Limusic
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v31
+
+      - id: update
+        run: |
+          version="$(./update.sh)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - id: changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.changes.outputs.changed == 'true'
+        run: nix flake check
+
+      - if: steps.changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: automation/update-limusic
+          delete-branch: true
+          commit-message: "chore: update limusic to ${{ steps.update.outputs.version }}"
+          title: "chore: update limusic to ${{ steps.update.outputs.version }}"
+          body: |
+            Updates the packaged Limusic AppImage to `${{ steps.update.outputs.version }}`.
+
+            CI builds the flake before this PR is created.
