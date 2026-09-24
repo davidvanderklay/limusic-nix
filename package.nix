@@ -7,10 +7,10 @@
 }:
 
 let
-  version = "0.7.3";
+  version = "0.8.3";
   src = fetchurl {
     url = "https://github.com/SimoHypers/limusic/releases/download/v${version}/limusic_${version}_amd64.AppImage";
-    hash = "sha256-RDwXrGkqZ8BvFiEBKKt27BA4saRhzbJUXdkQ6k+KFvw=";
+    hash = "sha256-u2jBXMFj8bqQf3Jn8xlbfrTbPkqoledentLIaSwILPA=";
   };
   contents = appimageTools.extract {
     pname = "limusic";
