@@ -17,4 +17,4 @@ limusic = {
 };
 ```
 
-The update workflow checks Limusic releases every six hours, updates the version and hash, runs `nix flake check`, and opens a pull request when a new AppImage is available.
+The update workflow checks Limusic releases every six hours, updates the version and hash, runs `nix flake check`, and opens and auto-merges a pull request when a new AppImage is available.

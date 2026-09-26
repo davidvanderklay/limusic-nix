@@ -33,6 +33,7 @@ jobs:
         run: nix flake check
 
       - if: steps.changes.outputs.changed == 'true'
+        id: create-pull-request
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -44,3 +45,10 @@ jobs:
             Updates the packaged Limusic AppImage to `${{ steps.update.outputs.version }}`.
 
             CI builds the flake before this PR is created.
+
+      - name: Auto-merge update pull request
+        if: steps.changes.outputs.changed == 'true' && steps.create-pull-request.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.create-pull-request.outputs.pull-request-number }}
+        run: gh pr merge "$PR_NUMBER" --auto --squash
